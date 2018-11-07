@@ -15,8 +15,7 @@
 
 import os
 import json
-import cPickle
-from itertools import izip
+import pickle
 
 import fire
 import h5py
@@ -65,7 +64,7 @@ class Classifier():
         y2l = map(lambda x: x[1], sorted(y2l.items(), key=lambda x: x[0]))
         inv_cate1 = self.get_inverted_cate1(cate1)
         rets = {}
-        for pid, p in izip(data['pid'], pred_y):
+        for pid, p in zip(data['pid'], pred_y):
             y = np.argmax(p)
             label = y2l[y]
             tkns = map(int, label.split('>'))
@@ -85,11 +84,11 @@ class Classifier():
         with open(out_path, 'w') as fout:
             for pid in pid_order:
                 ans = rets.get(pid, no_answer.format(pid=pid))
-                print >> fout, ans
+                print(ans, file=fout)
 
     def predict(self, data_root, model_root, test_root, test_div, out_path, readable=False):
         meta_path = os.path.join(data_root, 'meta')
-        meta = cPickle.loads(open(meta_path).read())
+        meta = pickle.loads(open(meta_path).read())
 
         model_fname = os.path.join(model_root, 'model.h5')
         self.logger.info('# of classes(train): %s' % len(meta['y_vocab']))
@@ -113,7 +112,7 @@ class Classifier():
         data_path = os.path.join(data_root, 'data.h5py')
         meta_path = os.path.join(data_root, 'meta')
         data = h5py.File(data_path, 'r')
-        meta = cPickle.loads(open(meta_path).read())
+        meta = pickle.loads(open(meta_path).read())
         self.weight_fname = os.path.join(out_dir, 'weights')
         self.model_fname = os.path.join(out_dir, 'model')
         if not os.path.isdir(out_dir):
@@ -152,7 +151,7 @@ class Classifier():
                             shuffle=True,
                             callbacks=[checkpoint])
 
-        model.load_weights(self.weight_fname) # loads from checkout point if exists
+        model.load_weights(self.weight_fname)  # loads from checkout point if exists
         open(self.model_fname + '.json', 'w').write(model.to_json())
         model.save(self.model_fname + '.h5')
 

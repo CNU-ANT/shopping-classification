@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
+
 os.environ['OMP_NUM_THREADS'] = '1'
 import re
 import sys
-import cPickle
+import pickle
 import traceback
 from collections import Counter
 from multiprocessing import Pool
@@ -28,6 +29,7 @@ import numpy as np
 from keras.utils.np_utils import to_categorical
 
 from misc import get_logger, Option
+
 opt = Option('./config.json')
 
 TRAIN_DATA_LIST = ['../train.chunk.0%d' % i for i in range(1, 10)]
@@ -136,7 +138,7 @@ class Data:
         self.logger = get_logger('data')
 
     def load_y_vocab(self):
-        self.y_vocab = cPickle.loads(open(self.y_vocab_path).read())
+        self.y_vocab = pickle.loads(open(self.y_vocab_path).read())
 
     def build_y_vocab(self):
         pool = Pool(opt.num_workers)
@@ -156,7 +158,7 @@ class Data:
             pool.join()
             raise
         self.logger.info('size of y vocab: %s' % len(self.y_vocab))
-        cPickle.dump(self.y_vocab, open(self.y_vocab_path, 'wb'), 2)
+        pickle.dump(self.y_vocab, open(self.y_vocab_path, 'wb'), 2)
 
     def _split_data(self, data_path_list, div, chunk_size=100000):
         total = 0
@@ -178,7 +180,7 @@ class Data:
                 continue
             rets.append((pid, y, x))
         self.logger.info('sz=%s' % (len(rets)))
-        open(out_path, 'w').write(cPickle.dumps(rets, 2))
+        open(out_path, 'w').write(pickle.dumps(rets, 2))
         self.logger.info('%s ~ %s done. (size: %s)' % (begin_offset, end_offset, end_offset - begin_offset))
 
     def _preprocessing(self, cls, data_path_list, div):
@@ -323,7 +325,7 @@ class Data:
         for input_chunk_idx in chunk_order:
             path = os.path.join(self.tmp_chunk_tpl % input_chunk_idx)
             self.logger.info('prcessing %s ...' % path)
-            data = list(enumerate(cPickle.loads(open(path).read())))
+            data = list(enumerate(pickle.loads(open(path).read())))
             np.random.shuffle(data)
             for data_idx, (pid, y, vw) in data:
                 if y is None:
@@ -367,7 +369,7 @@ class Data:
 
         data_fout.close()
         meta = {'y_vocab': self.y_vocab}
-        meta_fout.write(cPickle.dumps(meta, 2))
+        meta_fout.write(pickle.dumps(meta, 2))
         meta_fout.close()
 
         self.logger.info('# of classes: %s' % len(meta['y_vocab']))
@@ -375,6 +377,7 @@ class Data:
         self.logger.info('# of samples on dev: %s' % num_samples['dev'])
         self.logger.info('data: %s' % os.path.join(output_dir, 'data.h5py'))
         self.logger.info('meta: %s' % os.path.join(output_dir, 'meta'))
+
 
 if __name__ == '__main__':
     data = Data()

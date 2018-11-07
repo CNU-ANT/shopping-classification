@@ -25,6 +25,7 @@ from keras.layers.embeddings import Embedding
 from keras.layers.core import Dropout, Activation
 
 from misc import get_logger, Option
+
 opt = Option('./config.json')
 
 
@@ -52,7 +53,7 @@ class TextOnly:
             w_uni_mat = Reshape((max_len, 1))(w_uni)  # weight
 
             uni_embd_mat = dot([t_uni_embd, w_uni_mat], axes=1)
-            uni_embd = Reshape((opt.embd_size, ))(uni_embd_mat)
+            uni_embd = Reshape((opt.embd_size,))(uni_embd_mat)
 
             embd_out = Dropout(rate=0.5)(uni_embd)
             relu = Activation('relu', name='relu1')(embd_out)
@@ -60,7 +61,7 @@ class TextOnly:
             model = Model(inputs=[t_uni, w_uni], outputs=outputs)
             optm = keras.optimizers.Nadam(opt.lr)
             model.compile(loss='binary_crossentropy',
-                        optimizer=optm,
-                        metrics=[top1_acc])
+                          optimizer=optm,
+                          metrics=[top1_acc])
             model.summary(print_fn=lambda x: self.logger.info(x))
         return model
