@@ -2,6 +2,11 @@
 
 The ANT 팀의 KAKAO 대회 출전용 레포 - `쇼핑몰 상품 카테고리 분류` 
 
+## [Team Slack](https://join.slack.com/t/theantai/shared_invite/enQtNDc1MDk5ODQxNTQyLTlkYzkwZjIzYzVlYmQwOWNkYzlkZjM2YmIxMWMxYzI0NWQxNzQ5YTZjNDQ1OWQ3ZDhlMjI3MmFlZWFhOWYyMDE)
+
+팀 가입하고 싶은 분은 slack 또는 메일을 보내주세요!!
+
+
 ## 실행 방법
 
 0. 데이터의 위치
